@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #1e1e2e;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_basic", "label": "test_basic", "shape": "dot", "size": 15, "title": "tests.test_basic"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.app", "label": "app", "shape": "dot", "size": 391, "title": "src.flask.app"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.cli", "label": "cli", "shape": "dot", "size": 15, "title": "src.flask.cli"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.sansio.app", "label": "app", "shape": "dot", "size": 15, "title": "src.flask.sansio.app"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_blueprints", "label": "test_blueprints", "shape": "dot", "size": 15, "title": "tests.test_blueprints"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.sansio.scaffold", "label": "scaffold", "shape": "dot", "size": 15, "title": "src.flask.sansio.scaffold"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.sansio.blueprints", "label": "blueprints", "shape": "dot", "size": 15, "title": "src.flask.sansio.blueprints"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_cli", "label": "test_cli", "shape": "dot", "size": 15, "title": "tests.test_cli"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.helpers", "label": "helpers", "shape": "dot", "size": 15, "title": "src.flask.helpers"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.ctx", "label": "ctx", "shape": "dot", "size": 15, "title": "src.flask.ctx"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_templating", "label": "test_templating", "shape": "dot", "size": 15, "title": "tests.test_templating"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.sessions", "label": "sessions", "shape": "dot", "size": 15, "title": "src.flask.sessions"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.config", "label": "config", "shape": "dot", "size": 15, "title": "src.flask.config"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_testing", "label": "test_testing", "shape": "dot", "size": 15, "title": "tests.test_testing"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_helpers", "label": "test_helpers", "shape": "dot", "size": 15, "title": "tests.test_helpers"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_json", "label": "test_json", "shape": "dot", "size": 15, "title": "tests.test_json"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.testing", "label": "testing", "shape": "dot", "size": 15, "title": "src.flask.testing"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.json.tag", "label": "tag", "shape": "dot", "size": 47, "title": "src.flask.json.tag"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_user_error_handler", "label": "test_user_error_handler", "shape": "dot", "size": 15, "title": "tests.test_user_error_handler"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.wrappers", "label": "wrappers", "shape": "dot", "size": 15, "title": "src.flask.wrappers"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_config", "label": "test_config", "shape": "dot", "size": 15, "title": "tests.test_config"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_reqctx", "label": "test_reqctx", "shape": "dot", "size": 15, "title": "tests.test_reqctx"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_appctx", "label": "test_appctx", "shape": "dot", "size": 15, "title": "tests.test_appctx"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_views", "label": "test_views", "shape": "dot", "size": 15, "title": "tests.test_views"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.templating", "label": "templating", "shape": "dot", "size": 15, "title": "src.flask.templating"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.json.provider", "label": "provider", "shape": "dot", "size": 15, "title": "src.flask.json.provider"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.debughelpers", "label": "debughelpers", "shape": "dot", "size": 15, "title": "src.flask.debughelpers"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.views", "label": "views", "shape": "dot", "size": 15, "title": "src.flask.views"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_signals", "label": "test_signals", "shape": "dot", "size": 15, "title": "tests.test_signals"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.json.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "src.flask.json.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_async", "label": "test_async", "shape": "dot", "size": 15, "title": "tests.test_async"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.blueprints", "label": "blueprints", "shape": "dot", "size": 15, "title": "src.flask.blueprints"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.tutorial.flaskr.blog", "label": "blog", "shape": "dot", "size": 55, "title": "examples.tutorial.flaskr.blog"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.tutorial.flaskr.auth", "label": "auth", "shape": "dot", "size": 15, "title": "examples.tutorial.flaskr.auth"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "docs.conf", "label": "conf", "shape": "dot", "size": 15, "title": "docs.conf"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.conftest", "label": "conftest", "shape": "dot", "size": 15, "title": "tests.conftest"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_instance_config", "label": "test_instance_config", "shape": "dot", "size": 15, "title": "tests.test_instance_config"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.typing", "label": "typing", "shape": "dot", "size": 191, "title": "src.flask.typing"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.type_check.typing_route", "label": "typing_route", "shape": "dot", "size": 15, "title": "tests.type_check.typing_route"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_logging", "label": "test_logging", "shape": "dot", "size": 15, "title": "tests.test_logging"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_json_tag", "label": "test_json_tag", "shape": "dot", "size": 15, "title": "tests.test_json_tag"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.tutorial.tests.test_blog", "label": "test_blog", "shape": "dot", "size": 15, "title": "examples.tutorial.tests.test_blog"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.globals", "label": "globals", "shape": "dot", "size": 15, "title": "src.flask.globals"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.logging", "label": "logging", "shape": "dot", "size": 39, "title": "src.flask.logging"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.tutorial.tests.test_auth", "label": "test_auth", "shape": "dot", "size": 15, "title": "examples.tutorial.tests.test_auth"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_request", "label": "test_request", "shape": "dot", "size": 15, "title": "tests.test_request"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.tutorial.tests.conftest", "label": "conftest", "shape": "dot", "size": 15, "title": "examples.tutorial.tests.conftest"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.tutorial.flaskr.db", "label": "db", "shape": "dot", "size": 15, "title": "examples.tutorial.flaskr.db"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "src.flask.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.tutorial.flaskr.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "examples.tutorial.flaskr.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.celery.src.task_app.__init__", "label": "__init__", "shape": "dot", "size": 39, "title": "examples.celery.src.task_app.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_converters", "label": "test_converters", "shape": "dot", "size": 15, "title": "tests.test_converters"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.celery.src.task_app.views", "label": "views", "shape": "dot", "size": 15, "title": "examples.celery.src.task_app.views"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.javascript.tests.test_js_example", "label": "test_js_example", "shape": "dot", "size": 15, "title": "examples.javascript.tests.test_js_example"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_regression", "label": "test_regression", "shape": "dot", "size": 15, "title": "tests.test_regression"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_session_interface", "label": "test_session_interface", "shape": "dot", "size": 15, "title": "tests.test_session_interface"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.type_check.typing_error_handler", "label": "typing_error_handler", "shape": "dot", "size": 15, "title": "tests.type_check.typing_error_handler"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.tutorial.tests.test_db", "label": "test_db", "shape": "dot", "size": 15, "title": "examples.tutorial.tests.test_db"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.type_check.typing_app_decorators", "label": "typing_app_decorators", "shape": "dot", "size": 15, "title": "tests.type_check.typing_app_decorators"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.celery.src.task_app.tasks", "label": "tasks", "shape": "dot", "size": 15, "title": "examples.celery.src.task_app.tasks"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_subclassing", "label": "test_subclassing", "shape": "dot", "size": 15, "title": "tests.test_subclassing"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.blueprintapp.apps.admin.__init__", "label": "__init__", "shape": "dot", "size": 39, "title": "tests.test_apps.blueprintapp.apps.admin.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.signals", "label": "signals", "shape": "dot", "size": 15, "title": "src.flask.signals"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.javascript.js_example.views", "label": "views", "shape": "dot", "size": 31, "title": "examples.javascript.js_example.views"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.javascript.tests.conftest", "label": "conftest", "shape": "dot", "size": 15, "title": "examples.javascript.tests.conftest"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.blueprintapp.apps.frontend.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "tests.test_apps.blueprintapp.apps.frontend.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.tutorial.tests.test_factory", "label": "test_factory", "shape": "dot", "size": 15, "title": "examples.tutorial.tests.test_factory"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.blueprintapp.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "tests.test_apps.blueprintapp.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.cliapp.factory", "label": "factory", "shape": "dot", "size": 23, "title": "tests.test_apps.cliapp.factory"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.helloworld.hello", "label": "hello", "shape": "dot", "size": 23, "title": "tests.test_apps.helloworld.hello"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.celery.make_celery", "label": "make_celery", "shape": "dot", "size": 15, "title": "examples.celery.make_celery"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "examples.javascript.js_example.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "examples.javascript.js_example.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.cliapp.importerrorapp", "label": "importerrorapp", "shape": "dot", "size": 15, "title": "tests.test_apps.cliapp.importerrorapp"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.cliapp.multiapp", "label": "multiapp", "shape": "dot", "size": 15, "title": "tests.test_apps.cliapp.multiapp"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.flask.__main__", "label": "__main__", "shape": "dot", "size": 15, "title": "src.flask.__main__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.cliapp.app", "label": "app", "shape": "dot", "size": 15, "title": "tests.test_apps.cliapp.app"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.cliapp.inner1.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "tests.test_apps.cliapp.inner1.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.cliapp.inner1.inner2.flask", "label": "flask", "shape": "dot", "size": 15, "title": "tests.test_apps.cliapp.inner1.inner2.flask"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.subdomaintestmodule.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "tests.test_apps.subdomaintestmodule.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.helloworld.wsgi", "label": "wsgi", "shape": "dot", "size": 15, "title": "tests.test_apps.helloworld.wsgi"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.blueprintapp.apps.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "tests.test_apps.blueprintapp.apps.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.cliapp.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "tests.test_apps.cliapp.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_apps.cliapp.inner1.inner2.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "tests.test_apps.cliapp.inner1.inner2.__init__"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "color": "#666688", "from": "tests.test_basic", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "tests.test_basic", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "src.flask.app", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.cli", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.sansio.app", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.sansio.app", "to": "src.flask.logging"}, {"arrows": "to", "color": "#666688", "from": "tests.test_blueprints", "to": "tests.test_apps.blueprintapp.apps.admin.__init__"}, {"arrows": "to", "color": "#666688", "from": "tests.test_blueprints", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "src.flask.sansio.scaffold", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.sansio.blueprints", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "tests.test_cli", "to": "tests.test_apps.cliapp.factory"}, {"arrows": "to", "color": "#666688", "from": "tests.test_cli", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "src.flask.helpers", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.ctx", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "tests.test_templating", "to": "tests.test_apps.blueprintapp.apps.admin.__init__"}, {"arrows": "to", "color": "#666688", "from": "tests.test_templating", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_templating", "to": "src.flask.logging"}, {"arrows": "to", "color": "#666688", "from": "src.flask.sessions", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.config", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.config", "to": "src.flask.json.tag"}, {"arrows": "to", "color": "#666688", "from": "tests.test_testing", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_helpers", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_json", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "src.flask.testing", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.json.tag", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "tests.test_user_error_handler", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "src.flask.wrappers", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "tests.test_config", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_config", "to": "src.flask.json.tag"}, {"arrows": "to", "color": "#666688", "from": "tests.test_reqctx", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_appctx", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_views", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "src.flask.templating", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.json.provider", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.json.provider", "to": "src.flask.json.tag"}, {"arrows": "to", "color": "#666688", "from": "src.flask.debughelpers", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.views", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "tests.test_signals", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "src.flask.json.__init__", "to": "src.flask.json.tag"}, {"arrows": "to", "color": "#666688", "from": "src.flask.json.__init__", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "tests.test_async", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "src.flask.blueprints", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "examples.tutorial.flaskr.blog", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.tutorial.flaskr.auth", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.conftest", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_instance_config", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.type_check.typing_route", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.type_check.typing_route", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "tests.test_logging", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_logging", "to": "src.flask.logging"}, {"arrows": "to", "color": "#666688", "from": "tests.test_json_tag", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.tutorial.tests.test_blog", "to": "examples.tutorial.flaskr.blog"}, {"arrows": "to", "color": "#666688", "from": "src.flask.globals", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "src.flask.logging", "to": "src.flask.typing"}, {"arrows": "to", "color": "#666688", "from": "examples.tutorial.tests.test_auth", "to": "examples.tutorial.flaskr.blog"}, {"arrows": "to", "color": "#666688", "from": "examples.tutorial.tests.test_auth", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_request", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.tutorial.tests.conftest", "to": "examples.tutorial.flaskr.blog"}, {"arrows": "to", "color": "#666688", "from": "examples.tutorial.flaskr.db", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.tutorial.flaskr.__init__", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.celery.src.task_app.__init__", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_converters", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.celery.src.task_app.views", "to": "examples.celery.src.task_app.__init__"}, {"arrows": "to", "color": "#666688", "from": "examples.celery.src.task_app.views", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.javascript.tests.test_js_example", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_regression", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_session_interface", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.type_check.typing_error_handler", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.tutorial.tests.test_db", "to": "examples.tutorial.flaskr.blog"}, {"arrows": "to", "color": "#666688", "from": "tests.type_check.typing_app_decorators", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.celery.src.task_app.tasks", "to": "examples.celery.src.task_app.__init__"}, {"arrows": "to", "color": "#666688", "from": "tests.test_subclassing", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.blueprintapp.apps.admin.__init__", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.javascript.js_example.views", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.javascript.tests.conftest", "to": "examples.javascript.js_example.views"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.blueprintapp.apps.frontend.__init__", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.tutorial.tests.test_factory", "to": "examples.tutorial.flaskr.blog"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.blueprintapp.__init__", "to": "tests.test_apps.blueprintapp.apps.admin.__init__"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.blueprintapp.__init__", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.cliapp.factory", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.helloworld.hello", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.celery.make_celery", "to": "examples.celery.src.task_app.__init__"}, {"arrows": "to", "color": "#666688", "from": "examples.javascript.js_example.__init__", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "examples.javascript.js_example.__init__", "to": "examples.javascript.js_example.views"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.cliapp.importerrorapp", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.cliapp.multiapp", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.cliapp.app", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.cliapp.inner1.__init__", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.cliapp.inner1.inner2.flask", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.subdomaintestmodule.__init__", "to": "src.flask.app"}, {"arrows": "to", "color": "#666688", "from": "tests.test_apps.helloworld.wsgi", "to": "tests.test_apps.helloworld.hello"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.3,
+            "damping": 0.09,
+            "gravitationalConstant": -8000,
+            "springConstant": 0.05,
+            "springLength": 150
+        },
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

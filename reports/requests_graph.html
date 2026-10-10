@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #1e1e2e;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_requests", "label": "test_requests", "shape": "dot", "size": 31, "title": "tests.test_requests"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.models", "label": "models", "shape": "dot", "size": 103, "title": "src.requests.models"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.utils", "label": "utils", "shape": "dot", "size": 15, "title": "src.requests.utils"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_utils", "label": "test_utils", "shape": "dot", "size": 15, "title": "tests.test_utils"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.sessions", "label": "sessions", "shape": "dot", "size": 15, "title": "src.requests.sessions"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.adapters", "label": "adapters", "shape": "dot", "size": 15, "title": "src.requests.adapters"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.cookies", "label": "cookies", "shape": "dot", "size": 15, "title": "src.requests.cookies"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_lowlevel", "label": "test_lowlevel", "shape": "dot", "size": 15, "title": "tests.test_lowlevel"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "docs.conf", "label": "conf", "shape": "dot", "size": 15, "title": "docs.conf"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.auth", "label": "auth", "shape": "dot", "size": 15, "title": "src.requests.auth"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "src.requests.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests._types", "label": "_types", "shape": "dot", "size": 15, "title": "src.requests._types"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.testserver.server", "label": "server", "shape": "dot", "size": 15, "title": "tests.testserver.server"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.api", "label": "api", "shape": "dot", "size": 15, "title": "src.requests.api"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_testserver", "label": "test_testserver", "shape": "dot", "size": 15, "title": "tests.test_testserver"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.status_codes", "label": "status_codes", "shape": "dot", "size": 15, "title": "src.requests.status_codes"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.help", "label": "help", "shape": "dot", "size": 15, "title": "src.requests.help"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.exceptions", "label": "exceptions", "shape": "dot", "size": 15, "title": "src.requests.exceptions"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.structures", "label": "structures", "shape": "dot", "size": 15, "title": "src.requests.structures"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.compat", "label": "compat", "shape": "dot", "size": 15, "title": "src.requests.compat"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "docs._themes.flask_theme_support", "label": "flask_theme_support", "shape": "dot", "size": 15, "title": "docs._themes.flask_theme_support"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_structures", "label": "test_structures", "shape": "dot", "size": 15, "title": "tests.test_structures"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.conftest", "label": "conftest", "shape": "dot", "size": 15, "title": "tests.conftest"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests._internal_utils", "label": "_internal_utils", "shape": "dot", "size": 15, "title": "src.requests._internal_utils"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.hooks", "label": "hooks", "shape": "dot", "size": 15, "title": "src.requests.hooks"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.packages", "label": "packages", "shape": "dot", "size": 15, "title": "src.requests.packages"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.compat", "label": "compat", "shape": "dot", "size": 15, "title": "tests.compat"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_help", "label": "test_help", "shape": "dot", "size": 15, "title": "tests.test_help"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_hooks", "label": "test_hooks", "shape": "dot", "size": 15, "title": "tests.test_hooks"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.utils", "label": "utils", "shape": "dot", "size": 15, "title": "tests.utils"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.certs", "label": "certs", "shape": "dot", "size": 15, "title": "src.requests.certs"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "src.requests.__version__", "label": "__version__", "shape": "dot", "size": 15, "title": "src.requests.__version__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "tests.__init__"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_packages", "label": "test_packages", "shape": "dot", "size": 15, "title": "tests.test_packages"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "setup", "label": "setup", "shape": "dot", "size": 15, "title": "setup"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.test_adapters", "label": "test_adapters", "shape": "dot", "size": 15, "title": "tests.test_adapters"}, {"color": "#5B8AF5", "font": {"color": "white"}, "id": "tests.testserver.__init__", "label": "__init__", "shape": "dot", "size": 15, "title": "tests.testserver.__init__"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "color": "#666688", "from": "tests.test_requests", "to": "src.requests.models"}, {"arrows": "to", "color": "#666688", "from": "tests.test_utils", "to": "src.requests.models"}, {"arrows": "to", "color": "#666688", "from": "tests.test_lowlevel", "to": "src.requests.models"}, {"arrows": "to", "color": "#666688", "from": "tests.test_lowlevel", "to": "tests.test_requests"}, {"arrows": "to", "color": "#666688", "from": "docs.conf", "to": "src.requests.models"}, {"arrows": "to", "color": "#666688", "from": "tests.test_testserver", "to": "src.requests.models"}, {"arrows": "to", "color": "#666688", "from": "tests.test_testserver", "to": "tests.test_requests"}, {"arrows": "to", "color": "#666688", "from": "tests.test_structures", "to": "src.requests.models"}, {"arrows": "to", "color": "#666688", "from": "tests.conftest", "to": "src.requests.models"}, {"arrows": "to", "color": "#666688", "from": "tests.test_help", "to": "src.requests.models"}, {"arrows": "to", "color": "#666688", "from": "tests.test_hooks", "to": "src.requests.models"}, {"arrows": "to", "color": "#666688", "from": "tests.test_packages", "to": "src.requests.models"}, {"arrows": "to", "color": "#666688", "from": "tests.test_adapters", "to": "src.requests.models"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.3,
+            "damping": 0.09,
+            "gravitationalConstant": -8000,
+            "springConstant": 0.05,
+            "springLength": 150
+        },
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
