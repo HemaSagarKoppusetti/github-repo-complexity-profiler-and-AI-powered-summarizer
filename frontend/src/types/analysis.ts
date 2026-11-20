@@ -177,6 +177,14 @@ export interface ManifestData {
   total_python_files: number;
   truncated?: boolean;
   warning?: string | null;
+  diagnostics?: DataQualityDiagnostic[];
+}
+
+export interface DataQualityDiagnostic {
+  stage: string;
+  file?: string;
+  severity: string;
+  message: string;
 }
 
 export interface FullAnalysisResult {
@@ -188,6 +196,7 @@ export interface FullAnalysisResult {
   churn: ChurnData;
   hotspots: HotspotsData;
   duration_seconds: number;
+  diagnostics?: DataQualityDiagnostic[];
 }
 
 export interface AnalysisDetail {

@@ -92,6 +92,7 @@ def analyse_file_complexity(filepath: str) -> dict[str, Any]:
 def analyse_all(
     python_files: list[str],
     progress_cb: Callable[[int, int, str], None] | None = None,
+    file_entries: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Runs complexity analysis across all Python files in the manifest.
 
@@ -102,12 +103,69 @@ def analyse_all(
     Returns:
         dict with results and summary
     """
-    total = len(python_files)
-    logger.info("[complexity] Analysing %d Python files...", total)
+    analysis_inputs: list[dict[str, Any]]
+    if file_entries is None:
+        analysis_inputs = [
+            {"path": filepath, "language": "Python", "role": "source"}
+            for filepath in python_files
+        ]
+    else:
+        analysis_inputs = [
+            entry for entry in file_entries
+            if entry.get("role") in {"source", "test"}
+            and (entry.get("language") == "Python" or entry.get("lizard"))
+        ]
+    total = len(analysis_inputs)
+    logger.info("[complexity] Analysing %d code files...", total)
 
-    results = []
-    for idx, filepath in enumerate(python_files, 1):
-        result = analyse_file_complexity(filepath)
+    results: list[dict[str, Any]] = []
+    for idx, entry in enumerate(analysis_inputs, 1):
+        filepath = str(entry["path"])
+        if file_entries is None:
+            result = analyse_file_complexity(filepath)
+        elif entry.get("language") == "Python":
+            cached = entry.get("complexity")
+            if isinstance(cached, dict):
+                result = {
+                    "filepath": filepath,
+                    "rel_path": entry.get("rel_path", ""),
+                    "language": "Python",
+                    "role": entry.get("role", "source"),
+                    "loc": entry.get("loc", 0),
+                    "mi_available": True,
+                    **cached,
+                    "functions": cached.get("functions", []),
+                }
+                if entry.get("analysis_error"):
+                    result["error"] = entry["analysis_error"]
+            else:
+                result = analyse_file_complexity(filepath)
+        else:
+            lizard_functions = entry.get("lizard") or []
+            functions = [{
+                "name": item["name"],
+                "type": "Function",
+                "complexity": item["complexity"],
+                "rank": cc_rank(item["complexity"]),
+                "lineno": item["line"],
+                "nloc": item["nloc"],
+                "parameter_count": item["parameter_count"],
+            } for item in lizard_functions]
+            result = {
+                "filepath": filepath,
+                "rel_path": entry.get("rel_path", ""),
+                "language": entry.get("language", "Unknown"),
+                "role": entry.get("role", "source"),
+                "loc": entry.get("loc", 0),
+                "mi_available": False,
+                "mi_score": 100.0,
+                "mi_rank": "N/A",
+                "functions": functions,
+                "avg_cc": round(sum(item["complexity"] for item in functions) / len(functions), 2) if functions else 0.0,
+                "max_cc": max((item["complexity"] for item in functions), default=0),
+                "hotspot_fn": max(functions, key=lambda item: item["complexity"])["name"] if functions else None,
+                "error": None,
+            }
         results.append(result)
         if progress_cb and (idx % 25 == 0 or idx == total):
             progress_cb(idx, total, filepath)
@@ -134,14 +192,16 @@ def analyse_all(
 
     low_mi = sorted(valid, key=lambda x: x["mi_score"])[:5]
 
+    valid_mi = [result for result in valid if result.get("mi_available", True)]
     avg_mi = (
-        round(sum(r["mi_score"] for r in valid) / len(valid), 2)
-        if valid
+        round(sum(r["mi_score"] for r in valid_mi) / len(valid_mi), 2)
+        if valid_mi
         else 0.0
     )
 
     summary = {
         "total_files_analysed": len(results),
+        "total_python_files_analysed": sum(result.get("language", "Python") == "Python" for result in results),
         "total_functions": len(all_functions),
         "avg_mi_score": avg_mi,
         "low_mi_file_count": len(low_mi_files),

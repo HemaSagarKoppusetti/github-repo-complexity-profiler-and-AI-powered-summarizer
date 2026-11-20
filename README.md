@@ -28,7 +28,7 @@ A production-quality full-stack web application that autonomously clones, profil
   - **Complexity Charts:** Recharts bar distributions of CC ranks and top complex functions.
   - **Interactive Dependency Canvas:** Native Cytoscape.js directed graph with node sizing by in-degree, red cycle highlighting, neighbor illumination, and module search.
   - **History & Comparison:** Searchable past analyses table and side-by-side KPI comparison tool.
-  - **Multi-Format Exports:** Download reports as formatted Markdown, executive PDF documents, or raw JSON.
+  - **Multi-Format Exports:** Download chart-rich PDF, self-contained HTML, editable DOCX, Markdown, and raw JSON reports.
 
 ---
 
@@ -36,7 +36,7 @@ A production-quality full-stack web application that autonomously clones, profil
 
 | Layer | Technologies |
 |---|---|
-| **Backend** | Python 3.11+, FastAPI, Pydantic v2, SQLModel / SQLAlchemy, SQLite (`data/profiler.db`), Radon, NetworkX, GitPython, fpdf2, Ruff |
+| **Backend** | Python 3.11+, FastAPI, Pydantic v2, SQLAlchemy, SQLite (`data/profiler.db`), Radon, NetworkX, GitPython, ReportLab, python-docx, Matplotlib, Ruff |
 | **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, TanStack Query v5, React Router v6, Cytoscape.js + Dagre, Recharts, Lucide Icons, Vitest |
 | **Containers** | Docker, Docker Compose, Multi-stage builds |
 
@@ -129,6 +129,17 @@ RATE_LIMIT_PER_MINUTE=30
 ```bash
 cd frontend
 npx vitest run
+```
+
+### Export Reports from Analysis JSON
+```powershell
+.\venv\Scripts\python.exe -m core.exporters .\analysis.json --formats pdf,html,docx --out .\reports\
+```
+The same renderers power the dashboard's PDF, HTML, and DOCX download links. HTML exports are self-contained and include available charts inline.
+
+### Benchmark Analysis Stages
+```powershell
+.\venv\Scripts\python.exe .\scripts\benchmark.py .\path\to\local\repository
 ```
 
 ### Run Full End-to-End Smoke Test

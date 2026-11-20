@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = Field(default="openrouter", description="LLM provider: openrouter, mock, etc.")
     OPENROUTER_API_KEY: str = Field(default="")
     OPENROUTER_MODEL: str = Field(default="openrouter/free")
+    OPENROUTER_FALLBACK_MODELS: str = Field(default="")
     OPENROUTER_BASE_URL: str = Field(default="https://openrouter.ai/api/v1")
 
     # Security & Limits
@@ -32,6 +33,10 @@ class Settings(BaseSettings):
     MAX_REPO_SIZE_MB: int = Field(default=300)
     CLONE_TIMEOUT_SECONDS: int = Field(default=180)
     MAX_PYTHON_FILES: int = Field(default=2000)
+    MAX_ANALYSIS_FILES: int = Field(default=5000)
+    MAX_ANALYSIS_TIME_SECONDS: int = Field(default=600)
+    MAX_HISTORY_COMMITS: int = Field(default=2000)
+    MIN_FREE_DISK_MB: int = Field(default=100)
     MAX_CONCURRENT_JOBS: int = Field(default=2)
     RATE_LIMIT_PER_MINUTE: int = Field(default=60)
     CACHE_TTL_HOURS: int = Field(default=24)

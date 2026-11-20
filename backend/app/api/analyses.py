@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import json
 import logging
+import re
+import tempfile
 import threading
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -24,6 +26,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.core.cloner import parse_repo_name
+from app.core.exporters import export_report
 from app.db.database import get_db
 from app.db.models import Analysis
 from app.schemas.analysis import (
@@ -34,7 +37,6 @@ from app.schemas.analysis import (
     PaginatedResponse,
 )
 from app.services.events import event_broadcaster
-from app.services.pdf import generate_pdf_report
 from app.services.pipeline import regenerate_llm_report, run_analysis
 
 logger = logging.getLogger(__name__)
@@ -263,12 +265,12 @@ def download_markdown_report(
     )
 
 
-@router.get("/{analysis_id}/report.pdf")
-def download_pdf_report(
+def _download_report_export(
     analysis_id: str,
+    fmt: str,
     db: Session = Depends(get_db),
 ) -> Response:
-    """Downloads an executive summary and analysis report as a formatted PDF."""
+    """Render a report using the shared export model."""
     item = db.query(Analysis).filter(Analysis.id == analysis_id).first()
     if not item:
         raise HTTPException(
@@ -283,18 +285,53 @@ def download_pdf_report(
             detail={"code": "DATA_NOT_AVAILABLE", "message": "Analysis data is not yet available"},
         )
 
-    pdf_bytes = generate_pdf_report(
-        analysis_data=result_data,
-        repo_name=item.repo_name,
-        report_text=item.report_text,
-    )
+    try:
+        with tempfile.TemporaryDirectory(prefix="profiler-report-") as directory:
+            output_path = export_report(
+                {"repo_name": item.repo_name, "data": result_data},
+                fmt,
+                directory,
+            )
+            file_bytes = output_path.read_bytes()
+    except Exception as exc:
+        logger.exception("Report export failed for analysis %s (%s).", analysis_id, fmt)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "code": "EXPORT_FAILED",
+                "message": f"The {fmt.upper()} report could not be generated.",
+            },
+        ) from exc
 
-    filename = f"{item.repo_name}_report.pdf"
+    safe_repo_name = re.sub(r"[^A-Za-z0-9._-]+", "_", item.repo_name).strip("._")
+    filename = f"{safe_repo_name or 'repository'}_report.{fmt}"
     return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
+        content=file_bytes,
+        media_type={
+            "pdf": "application/pdf",
+            "html": "text/html",
+            "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        }[fmt],
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+@router.get("/{analysis_id}/report.pdf")
+def download_pdf_report(analysis_id: str, db: Session = Depends(get_db)) -> Response:
+    """Download a chart-rich PDF report."""
+    return _download_report_export(analysis_id, "pdf", db)
+
+
+@router.get("/{analysis_id}/report.html")
+def download_html_report(analysis_id: str, db: Session = Depends(get_db)) -> Response:
+    """Download the self-contained HTML report."""
+    return _download_report_export(analysis_id, "html", db)
+
+
+@router.get("/{analysis_id}/report.docx")
+def download_docx_report(analysis_id: str, db: Session = Depends(get_db)) -> Response:
+    """Download the editable DOCX report."""
+    return _download_report_export(analysis_id, "docx", db)
 
 
 @router.get("/{analysis_id}/export.json")

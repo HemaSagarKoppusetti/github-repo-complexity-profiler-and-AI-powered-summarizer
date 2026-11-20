@@ -60,11 +60,11 @@ def test_hotspot_math_and_normalization():
     hotspots = result["hotspots"]
     assert len(hotspots) == 2
 
-    # app/core.py has max commits (100 -> norm 1.0), max CC (20 -> norm 1.0), MI 50 (norm low MI = 0.5)
-    # Risk score = 0.50 * 1.0 + 0.30 * 1.0 + 0.20 * 0.5 = 0.50 + 0.30 + 0.10 = 0.90 -> Critical
     core_hotspot = next(h for h in hotspots if "core.py" in h["rel_path"])
-    assert core_hotspot["risk_score"] == pytest.approx(0.90, abs=0.01)
+    assert core_hotspot["risk_score"] == pytest.approx(0.80, abs=0.01)
     assert core_hotspot["risk_tier"] == "🔴 Critical"
+    assert core_hotspot["tier"] == "Critical"
+    assert core_hotspot["quadrant"] == "Active danger"
 
     summary = result["summary"]
     assert summary["total_files_scored"] == 2

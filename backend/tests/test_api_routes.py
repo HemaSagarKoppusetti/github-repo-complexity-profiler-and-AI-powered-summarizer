@@ -130,6 +130,16 @@ def test_get_analysis_detail_and_exports():
     assert "application/pdf" in res_pdf.headers["content-type"]
     assert res_pdf.content[:4] == b"%PDF"
 
+    res_html = client.get("/api/analyses/test-job-uuid/report.html")
+    assert res_html.status_code == 200
+    assert "text/html" in res_html.headers["content-type"]
+    assert "<!doctype html>" in res_html.text.lower()
+
+    res_docx = client.get("/api/analyses/test-job-uuid/report.docx")
+    assert res_docx.status_code == 200
+    assert "application/vnd.openxmlformats-officedocument.wordprocessingml.document" in res_docx.headers["content-type"]
+    assert res_docx.content[:2] == b"PK"
+
     # DELETE
     res_del = client.get("/api/analyses/test-job-uuid")
     assert res_del.status_code == 200

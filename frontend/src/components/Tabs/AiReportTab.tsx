@@ -9,6 +9,8 @@ import {
   FileText,
   FileCode,
   FileSpreadsheet,
+  Globe,
+  FileType,
   AlertTriangle,
 } from 'lucide-react';
 import { api } from '../../api/client';
@@ -131,7 +133,7 @@ export const AiReportTab: React.FC<AiReportTabProps> = ({
           <Download className="w-4 h-4 text-blue-500" />
           Export Artifacts
         </h4>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           <a
             href={api.getReportMdUrl(analysisId)}
             download={`${repoName}_report.md`}
@@ -148,6 +150,24 @@ export const AiReportTab: React.FC<AiReportTabProps> = ({
           >
             <FileSpreadsheet className="w-4 h-4 text-rose-500" />
             Download PDF Report (.pdf)
+          </a>
+
+          <a
+            href={api.getReportHtmlUrl(analysisId)}
+            download={`${repoName}_report.html`}
+            className="flex items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium text-slate-800 dark:text-slate-200 transition-colors"
+          >
+            <Globe className="w-4 h-4 text-orange-500" />
+            Download HTML Report (.html)
+          </a>
+
+          <a
+            href={api.getReportDocxUrl(analysisId)}
+            download={`${repoName}_report.docx`}
+            className="flex items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium text-slate-800 dark:text-slate-200 transition-colors"
+          >
+            <FileType className="w-4 h-4 text-blue-700" />
+            Download DOCX Report (.docx)
           </a>
 
           <a

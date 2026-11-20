@@ -94,6 +94,14 @@ export const api = {
     return `${BASE_URL}/analyses/${id}/report.pdf`;
   },
 
+  getReportHtmlUrl(id: string): string {
+    return `${BASE_URL}/analyses/${id}/report.html`;
+  },
+
+  getReportDocxUrl(id: string): string {
+    return `${BASE_URL}/analyses/${id}/report.docx`;
+  },
+
   getExportJsonUrl(id: string): string {
     return `${BASE_URL}/analyses/${id}/export.json`;
   },

@@ -118,6 +118,7 @@ export const AnalysisDashboardPage: React.FC = () => {
   const currentError = liveEvent?.error || analysis.error;
 
   const result = analysis.result;
+  const diagnostics = result?.diagnostics ?? result?.manifest.diagnostics ?? [];
 
   const handleRetry = async () => {
     try {
@@ -240,6 +241,28 @@ export const AnalysisDashboardPage: React.FC = () => {
               icon={<Network className="w-5 h-5" />}
             />
           </div>
+
+          {diagnostics.length > 0 && (
+            <section
+              aria-labelledby="data-quality-heading"
+              className="rounded-2xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/30 p-5"
+            >
+              <h3 id="data-quality-heading" className="text-sm font-bold text-amber-900 dark:text-amber-200">
+                Data quality and limitations ({diagnostics.length})
+              </h3>
+              <ul className="mt-2 space-y-1 text-xs text-amber-800 dark:text-amber-300">
+                {diagnostics.slice(0, 10).map((item, index) => (
+                  <li key={`${item.stage}-${item.file ?? ''}-${index}`}>
+                    <strong>{item.severity} · {item.stage}</strong>
+                    {item.file ? ` · ${item.file}` : ''}: {item.message}
+                  </li>
+                ))}
+                {diagnostics.length > 10 && (
+                  <li>And {diagnostics.length - 10} additional diagnostics are included in the exported reports.</li>
+                )}
+              </ul>
+            </section>
+          )}
 
           {/* Tab Navigation */}
           <div className="border-b border-slate-200 dark:border-slate-800">

@@ -10,12 +10,14 @@ import logging
 import os
 import shutil
 import stat
+import subprocess
 import sys
 import tempfile
 from collections.abc import Callable
 from typing import Any
+from urllib.parse import urlsplit
 
-from git import GitCommandError, Repo
+from app.schemas.analysis import validate_github_repo_url
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +55,8 @@ def parse_repo_name(github_url: str) -> str:
 
     Example: https://github.com/pallets/flask -> flask
     """
-    url = github_url.rstrip("/").removesuffix(".git")
-    return url.split("/")[-1]
+    parts = [part for part in urlsplit(github_url).path.strip("/").split("/") if part]
+    return parts[-1].removesuffix(".git") if len(parts) == 2 else "repository"
 
 
 def get_dir_size_mb(path: str) -> float:
@@ -75,6 +77,7 @@ def clone_repo(
     target_dir: str | None = None,
     timeout: int = 180,
     max_size_mb: int = 300,
+    depth: int = 2000,
 ) -> dict[str, Any]:
     """Clones a GitHub repo into a local directory with timeout and size guards.
 
@@ -88,6 +91,16 @@ def clone_repo(
         dict with success (bool), path (str | None), name (str), url (str), error (str | None)
     """
     repo_name = parse_repo_name(github_url)
+    try:
+        canonical_url = validate_github_repo_url(github_url)
+    except ValueError as exc:
+        return {
+            "success": False,
+            "path": None,
+            "name": repo_name,
+            "url": "",
+            "error": str(exc),
+        }
 
     if target_dir is None:
         base = tempfile.gettempdir()
@@ -99,18 +112,20 @@ def clone_repo(
         _safe_rmtree(target_dir)
 
     os.makedirs(target_dir, exist_ok=True)
-    logger.info("[cloner] Cloning '%s' from %s...", repo_name, github_url)
+    logger.info("[cloner] Cloning '%s'...", repo_name)
 
     try:
-        # Clone repo; note: GitPython does not support kill_after_timeout on Windows
-        clone_kwargs = {}
-        if os.name != "nt":
-            clone_kwargs["kill_after_timeout"] = timeout
-
-        Repo.clone_from(
-            github_url,
-            target_dir,
-            **clone_kwargs,
+        subprocess.run(
+            [
+                "git", "clone", "--depth", str(max(1, depth)),
+                "--single-branch", "--no-tags", "--", canonical_url, target_dir,
+            ],
+            capture_output=True,
+            check=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=timeout,
         )
 
         size_mb = get_dir_size_mb(target_dir)
@@ -131,26 +146,35 @@ def clone_repo(
             "success": True,
             "path": target_dir,
             "name": repo_name,
-            "url": github_url,
+            "url": canonical_url,
             "error": None,
             "size_mb": size_mb,
+            "depth": max(1, depth),
         }
-
-    except GitCommandError as e:
-        error_msg = str(e)
+    except subprocess.TimeoutExpired:
         _safe_rmtree(target_dir)
+        error_msg = f"Git clone exceeded its {timeout}s timeout."
+        logger.error("[cloner] %s", error_msg)
+        return {
+            "success": False,
+            "path": None,
+            "name": repo_name,
+            "url": canonical_url,
+            "error": error_msg,
+        }
+    except subprocess.CalledProcessError as e:
+        error_msg = (e.stderr or "").strip()
         if "Authentication failed" in error_msg or "Repository not found" in error_msg or "not found" in error_msg.lower():
-            friendly_err = (
-                "Repository not found or private. Please ensure the repository URL is correct and public."
-            )
+            friendly_err = "Repository not found or private. Please ensure the repository URL is correct and public."
         else:
-            friendly_err = f"Git clone failed: {error_msg.strip()}"
+            friendly_err = f"Git clone failed ({e.returncode})."
+        _safe_rmtree(target_dir)
         logger.error("[cloner] ❌ Git error: %s", friendly_err)
         return {
             "success": False,
             "path": None,
             "name": repo_name,
-            "url": github_url,
+            "url": canonical_url,
             "error": friendly_err,
         }
 
@@ -161,8 +185,8 @@ def clone_repo(
             "success": False,
             "path": None,
             "name": repo_name,
-            "url": github_url,
-            "error": str(e),
+            "url": canonical_url,
+            "error": f"Clone failed ({type(e).__name__}).",
         }
 
 
