@@ -1,0 +1,28 @@
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+exclude = [
+    ".git",
+    "venv",
+    ".venv",
+    "__pycache__",
+    "node_modules",
+    "frontend",
+    "data",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
+ignore = [
+    "B008",  # FastAPI Depends() / Query() in function default arguments
+    "B904",  # Exception chaining
+    "E501",  # Line length
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.pytest.ini_options]
+pythonpath = ["backend"]
+testpaths = ["backend/tests"]
+
